@@ -1,4 +1,7 @@
-﻿namespace CSAdvancedProg16_PredefinedInterfaces
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace CSAdvancedProg16_PredefinedInterfaces
 {
     internal class Program
     {
@@ -59,6 +62,34 @@
             
             
             #region INotifyPropertyChanged
+            //Used to get notified via an event as a property is changed in any aspect.
+            Person4 person41 = new(); //Be careful about object initializer here because the setter of the properties are..
+            //.. called here which means that our event is to be triggered and before adding such a method below to the event, it causes errors.
+            //You better create the instance not triggering any properties and then modify them after adding the method(delegate) below
+            /*person41.PropertyChanged += (sender, e) => { Console.WriteLine($"{e.PropertyName} is changed with {(sender as Person4)?.Age}.");};
+            person41.Age = 26;
+            person41.Age = 27;
+            person41.Age = 28;
+            person41.Age = 29;*/
+
+            #endregion
+            
+            
+            #region IEquatable
+            //We will use this one to compare two instances in equality aspect.
+            //With a method you might be familiar to, "Equals()"
+            //When used with especially collections, it has favourable performance efficiency.
+            //We should not forget about the usage availability of records rather than implementing this interface to the classes, ..
+            //.. these abilities the relevant interface provides to the implementing classes are available in default in records. However, even a single..
+            //.. property is not the same with the other object in records, you will get a negative in comparisons whereas you can specify which members of..
+            //.. the class will be checked with IEquatable interface, within the body of the Equals mehtod.
+            /*Person5 person51 = new(){Name = "John Doe", Age = 25};
+            Person5 person52 = new(){Name = "Doe John", Age = 24};
+            Person5 person53 = new(){Name = "Doe John", Age = 24};
+            var equality = person51.Equals(person52);
+            Console.WriteLine(equality);
+            equality = person52.Equals(person53);
+            Console.WriteLine(equality);*/
             #endregion
         }
 
@@ -105,9 +136,51 @@
             return new Person3() {Name = this.Name, Age = this.Age, Human = this.Human }; //Evenn this way, as you may estimate, Human of the cloned object..
             //will be logically affected if the same member of the clone object gets changed in any aspect.
         }
-        
-        #region INotifyPropertyChanged
-        #endregion
     }
+    #endregion
+    
+    
+    #region INotifyPropertyChanged
+    class Person4 : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged; //PropertyChangedEventHandler is a predeclared delegate we can utilize from..
+        //.. creating this event. It will be notifying us about the property changes.
+        private string _name; //Should not forget about declaring the variables as private since we will be forming full properties for them.
+        private int _age;
+        internal string Name {
+            get {return _name; }
+            set
+            {
+                    _name = value;
+                    PropertyChanged(this, new PropertyChangedEventArgs(Name));
+            }
+        }
+        internal int Age { 
+            get {return _age; }
+            set
+            {
+                    _age = value;
+                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(Age)));
+            }
+        }
+    }
+    #endregion
+    
+    
+    #region IEquatable
+
+    class Person5 :IEquatable<Person5>
+    {
+        internal string Name { get; set; }
+        internal int Age { get; set; }
+
+        public bool Equals(Person5 other)
+        {
+            if(other == null)
+                return false;
+            return this.Name == other.Name && this.Age == other.Age;
+        }
+    }
+
     #endregion
 }
