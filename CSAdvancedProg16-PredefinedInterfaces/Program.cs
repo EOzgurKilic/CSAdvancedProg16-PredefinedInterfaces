@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System.Collections;
+using System.ComponentModel;
+using System.Data.SqlClient;
 using System.Runtime.CompilerServices;
 
 namespace CSAdvancedProg16_PredefinedInterfaces
@@ -64,17 +66,17 @@ namespace CSAdvancedProg16_PredefinedInterfaces
             #region INotifyPropertyChanged
             //Used to get notified via an event as a property is changed in any aspect.
             Person4 person41 = new(); //Be careful about object initializer here because the setter of the properties are..
-            //.. called here which means that our event is to be triggered and before adding such a method below to the event, it causes errors.
-            //You better create the instance not triggering any properties and then modify them after adding the method(delegate) below
-            /*person41.PropertyChanged += (sender, e) => { Console.WriteLine($"{e.PropertyName} is changed with {(sender as Person4)?.Age}.");};
-            person41.Age = 26;
-            person41.Age = 27;
-            person41.Age = 28;
-            person41.Age = 29;*/
+                                      //.. called here which means that our event is to be triggered and before adding such a method below to the event, it causes errors.
+                                      //You better create the instance not triggering any properties and then modify them after adding the method(delegate) below
+            /*person41.PropertyChanged += (sender, e) => { Console.WriteLine($"{e.PropertyName} is changed with {(sender as Person4)?.Age}."); };
+             person41.Age = 26;
+             person41.Age = 27;
+             person41.Age = 28;
+             person41.Age = 29;*/
 
             #endregion
-            
-            
+
+
             #region IEquatable
             //We will use this one to compare two instances in equality aspect.
             //With a method you might be familiar to, "Equals()"
@@ -90,6 +92,30 @@ namespace CSAdvancedProg16_PredefinedInterfaces
             Console.WriteLine(equality);
             equality = person52.Equals(person53);
             Console.WriteLine(equality);*/
+            #endregion
+
+
+            #region IEnumerable
+            //IEnumarable is the infterface allowing classes to utilize from foreach.
+            //More compherensive info about enumerators is in the next tutorial.
+            /*Storage storage1 = new Storage();
+            foreach (string storage in storage1)
+                Console.WriteLine(storage);*/
+            #endregion
+
+
+            #region IDisposable
+            //We are using this one to control and track memory allocation in .Net
+            //Used with the destructor (Reminder Definition: Method we define in a class if we wanna trigger the garbage collector manually at a specific point
+            //to obliterate the relevant instance of that class which is performed at a random time in default.)
+            using MyDataBase myDataBase1 = new MyDataBase(); //using keyword in this context calls Dispose method automatically for the marked instance right after..
+            //.. the scopes where the relevant object is defined is finished.
+            //There is another use way of using keyword which allows you to determine those scopes specifically too;
+            using (MyDataBase myDataBase2 = new MyDataBase()) 
+            {
+                //After the execution of this area is finished, Dispose Method is called.
+            }
+            //myDataBase1.Dispose(); //Of course you can do this manually too.
             #endregion
         }
 
@@ -182,5 +208,33 @@ namespace CSAdvancedProg16_PredefinedInterfaces
         }
     }
 
+    #endregion
+
+
+    #region IEnumerable
+    class Storage : IEnumerable 
+    {
+        List<string> list1 = new List<string>() {"Efe", "Ozgur", "Kilic" };
+        public IEnumerator GetEnumerator() //A lil info, you can form this method without the implemented interface.
+                                           //The interface only makes it obligatory to declare it within the class.
+        {
+            return list1.GetEnumerator();
+        }
+    }
+    #endregion
+
+
+    #region IDisposable
+    class MyDataBase:IDisposable 
+    {
+        SqlConnection connection;
+        SqlCommand command;
+
+        public void Dispose() 
+        {
+            connection = null;
+            command = null;
+        }
+    }
     #endregion
 }
